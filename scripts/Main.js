@@ -238,15 +238,12 @@ define(['http://worldwindserver.net/webworldwind/worldwindlib.js',
 
         }
 
-        earthQuakes == updatedEarthQuakes;
-        if (indexofpreviousRecent != 0) { //if the earthquakes are different check the latest tweet
+        earthQuakes = updatedEarthQuakes;
+        if (indexofpreviousRecent != 0 && indexofpreviousRecent != -1) { //if the earthquakes are different check the latest tweet
 
             cb.setConsumerKey("VddGNUN9GWxbbKBoHDzhNRjjo", "noC4s8BEKQCu4gZoXx2E13CYWzbA7gUjL9dM35IwJLtErfKTjb");
             cb.setToken("3416857132-Fv8A8BIrbb7OGYoUODrfDb8bDvqhu1OBbusFzgj", "24qSgQIOfVBWiSudRI1GX9EivqrneqOqlG3c42gdA20Ny");
 
-            var params = {
-                status: placeMark.getTweetText(earthQuakes[0])
-            };
 
             cb.__call(
                 "account_verifyCredentials",
