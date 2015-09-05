@@ -254,7 +254,7 @@ define(['http://worldwindserver.net/webworldwind/worldwindlib.js',
                     earthQuakes = updatedEarthQuakes;
                     for (var i = indexofpreviousRecent - 1; i >= 0; i--) //for each new earthquake check to see if it was the last tweet
                     {
-                        if ((previousStatus.indexOf(updatedEarthQuakes[i].title) < 0) && (previousStatus.indexOf("Depth : " + updatedEarthQuakes[i].depth + "kilometers") < 0) && (previousStatus.indexOf(" M " + updatedEarthQuakes[i].magnitude.toString()) < 0)) {
+                        if ((previousStatus.indexOf(updatedEarthQuakes[i].title) < 0) && (previousStatus.indexOf("Depth : " + updatedEarthQuakes[i].depth + "kilometers") < 0) && (previousStatus.indexOf(" M " + updatedEarthQuakes[i].magnitude.toPrecision(2)) < 0)) {
                             var params = {
                                 status: placeMark.getTweetText(updatedEarthQuakes[i])
                             };
@@ -278,7 +278,7 @@ define(['http://worldwindserver.net/webworldwind/worldwindlib.js',
             );
 
         }
-return earthQuakes;
+        return earthQuakes;
     }
 
 //end of timer-----------
@@ -289,29 +289,52 @@ return earthQuakes;
 /// tweet the earthquake obtained from the initialization of the session
 ///
     function makeTwitterCalls(cb, earthQuakes, previousStatus, placeMark) {
+        var NASAuser;
         cb.__call(
             "account_verifyCredentials",
             {},
             function (reply) {  //get the account and see what last tweet was
+                NASAuser = reply;
                 previousStatus = reply.status.text;
                 var sx = previousStatus.toString().indexOf("&lt;!&gt;");
 
                 if ((previousStatus.toString().indexOf(earthQuakes[0].title) < 0) && (previousStatus.toString().indexOf("Depth : " + earthQuakes[0].depth + "kilometers") < 0) && (previousStatus.toString().indexOf(" M " + earthQuakes[0].magnitude.toString()) < 0)) {
-                    sx = previousStatus.toString().indexOf(earthQuakes[0].title);
-                    sx = previousStatus.toString().indexOf("Depth : " + earthQuakes[0].depth + "kilometers");
-                    var params = {
-                        status: placeMark.getTweetText(earthQuakes[0])
-                    };
-
-
-                    cb.__call(
-                        "statuses_update",
-                        params,
-                        function (reply) {
-                            //Currently we don't need to do anything with the reply received from twitter in JSON format.
-                            console.log(reply);
+                    var i = 0,
+                        indexofpreviousTweet = -1;
+                    while (indexofpreviousTweet == -1 && i < earthQuakes.length) {
+                        var earthQuakeString = placeMark.getTweetText(earthQuakes[i]);
+                        var xx = previousStatus.indexOf(earthQuakes[i].title);
+                        var yy = previousStatus.indexOf(earthQuakes[i].depth);
+                        var zz = previousStatus.indexOf(earthQuakes[i].magnitude.toPrecision(2));
+                        var earthQuakeString = placeMark.getTweetText(earthQuakes[i]); var earthQuakeString = placeMark.getTweetText(earthQuakes[i]);
+                        if ((previousStatus.indexOf(earthQuakes[i].title) > 0) && (previousStatus.indexOf(earthQuakes[i].depth) > 0) && (previousStatus.indexOf(earthQuakes[i].magnitude.toPrecision(2)) > 0)) {
+                            indexofpreviousTweet = i;
                         }
-                    );
+                        else {
+                            i++;
+                        }
+                    }
+
+                    for (var i = indexofpreviousTweet- 1; i >= 0; i--) //for each new earthquake check to see if it was the last tweet
+                    {
+                        var earthQuakeString = placeMark.getTweetText(earthQuakes[i]);
+                        //To account for multiple apps at the same time make sure that the status is not tweeted
+                        if ((previousStatus.indexOf(earthQuakes[i].title) < 0) && (previousStatus.indexOf("Depth : " + earthQuakes[i].depth + "kilometers") < 0) && (previousStatus.indexOf(" M " + earthQuakes[i].magnitude.toPrecision(2)) < 0)) {
+                            var params = {
+                                status: placeMark.getTweetText(earthQuakes[i])
+                            };
+
+                            cb.__call(
+                                "statuses_update",
+                                params,
+                                function (reply) {
+                                    //Currently we don't need to do anything with the reply received from twitter in JSON format.
+                                    console.log(reply);
+                                }
+                            );
+
+                        }
+                    }
                 }
             }
         );
