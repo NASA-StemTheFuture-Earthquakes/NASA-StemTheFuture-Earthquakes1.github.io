@@ -302,10 +302,7 @@ define(['http://worldwindserver.net/webworldwind/worldwindlib.js',
                     var i = 0,
                         indexofpreviousTweet = -1;
                     while (indexofpreviousTweet == -1 && i < earthQuakes.length) {
-                        var earthQuakeString = placeMark.getTweetText(earthQuakes[i]);
-                        var xx = previousStatus.indexOf(earthQuakes[i].title);
-                        var yy = previousStatus.indexOf(earthQuakes[i].depth);
-                        var zz = previousStatus.indexOf(earthQuakes[i].magnitude.toPrecision(2));
+
                         var earthQuakeString = placeMark.getTweetText(earthQuakes[i]); var earthQuakeString = placeMark.getTweetText(earthQuakes[i]);
                         if ((previousStatus.indexOf(earthQuakes[i].title) > 0) && (previousStatus.indexOf(earthQuakes[i].depth) > 0) && (previousStatus.indexOf(earthQuakes[i].magnitude.toPrecision(2)) > 0)) {
                             indexofpreviousTweet = i;
@@ -314,7 +311,10 @@ define(['http://worldwindserver.net/webworldwind/worldwindlib.js',
                             i++;
                         }
                     }
-
+                    if(indexofpreviousTweet == -1)
+                    {
+                        indexofpreviousTweet = earthQuakes.length-1;ß
+                    }
                     for (var i = indexofpreviousTweet- 1; i >= 0; i--) //for each new earthquake check to see if it was the last tweet
                     {
                         var earthQuakeString = placeMark.getTweetText(earthQuakes[i]);
